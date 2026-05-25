@@ -37,12 +37,14 @@ def do_run_migrations(connection):
 async def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = settings.DATABASE_URL
-    
+
+    use_ssl = "neon.tech" in settings.DATABASE_URL
+
     connectable = async_engine_from_config(
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        connect_args={"ssl": False},
+        connect_args={"ssl": use_ssl},
     )
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
